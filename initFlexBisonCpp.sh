@@ -19,6 +19,7 @@ EOF
 
 cat>lex.l<<'EOF'
 %option noyywrap
+%x C_COMMENT
 %{
 #include "common.h"
 %}
@@ -36,6 +37,12 @@ cat>lex.l<<'EOF'
 \n              { return EOL; }
 "//".*  
 [ \t]           { /* ignore white space */ }
+
+        /* c style comments*/
+"/*"            { BEGIN(C_COMMENT); }
+<C_COMMENT>"*/" { BEGIN(INITIAL); }
+<C_COMMENT>.    { }
+<C_COMMENT>\n   { }
 .               { yyerror("Mystery char");}
 %%
 EOF

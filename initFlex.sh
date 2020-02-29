@@ -16,6 +16,7 @@ EOF
 cat>lex.l<<'EOF'
    /*Comment like this*/
 %option noyywrap
+%x C_COMMENT
 
 %{
 #include <stdio.h>
@@ -26,10 +27,16 @@ int lines = 0;
 %}
 
 %%
-    /* COMMENT like this,not begin at the begining of line */
+        /* COMMENT like this,not begin at the begining of line */
 [a-zA-Z]+   { words++; chars += strlen(yytext); }
 \n          { chars++; lines++; }
 .           { chars++; }
+
+        /* c style comments*/
+"/*"                        { BEGIN(C_COMMENT); }
+<C_COMMENT>"*/"             { BEGIN(INITIAL); }
+<C_COMMENT>.                { }
+<C_COMMENT>\n               { }
 %%
 
 int main(int argc, char **argv)
