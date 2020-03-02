@@ -6,6 +6,23 @@ fi
 root="$(cd $(dirname $rpath) && pwd)"
 # write your code below
 
+dest=${1}
+if [ -z "${dest}" ];then
+    echo -n "Enter install destination: "
+    read dest
+fi
+if [ -z "${dest}" ];then
+    echo "Wrong empty,Bye!"
+    exit 1
+fi
+
+if [ ! -d "${dest}" ];then
+    echo "Creating ${dest}..."
+    mkdir -p "${dest}"
+fi
+
+cd "${dest}"
+
 cat>README<<'EOF'
 build commands:
     mkdir build && cd $_

@@ -1,5 +1,22 @@
 #!/bin/bash
 
+dest=${1}
+if [ -z "${dest}" ];then
+    echo -n "Enter install destination: "
+    read dest
+fi
+if [ -z "${dest}" ];then
+    echo "Wrong empty,Bye!"
+    exit 1
+fi
+
+if [ ! -d "${dest}" ];then
+    echo "Creating ${dest}..."
+    mkdir -p "${dest}"
+fi
+
+cd "${dest}"
+
 cat>common.h<<'EOF'
 #include <string>
 #include <iostream>
