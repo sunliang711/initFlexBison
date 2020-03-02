@@ -18,10 +18,12 @@ fi
 cd "${dest}"
 
 cat>common.h<<'EOF'
-#include "parser.h"
+#include "__parser.h"
+
 int yylex();
 void yyerror(const char* msg);
 
+extern int yylineno;
 extern FILE* yyin;
 EOF
 
@@ -34,6 +36,7 @@ EOF
 
 cat>lex.l<<'EOF'
 %option noyywrap
+%option yylineno
 %x C_COMMENT
 %{
 #include "common.h"
@@ -152,14 +155,17 @@ CMAKE_MINIMUM_REQUIRED(VERSION 2.8)
 PROJECT(parser)
 
 
+SET(PSD ${PROJECT_SOURCE_DIR})
+SET(INTER_FILES ${PSD}/__lex.c ${PSD}/__parser.c ${PSD}/__parser.h ${PSD}/__parser.output)
+
 add_custom_command(
-    OUTPUT ${PROJECT_SOURCE_DIR}/lex.c ${PROJECT_SOURCE_DIR}/parser.c ${PROJECT_SOURCE_DIR}/parser.h ${CMAKE_SOURCE_DIR}/parser.output
-    COMMAND flex -o ${PROJECT_SOURCE_DIR}/lex.c ${PROJECT_SOURCE_DIR}/lex.l
-    COMMAND bison -dvt -o ${PROJECT_SOURCE_DIR}/parser.c ${PROJECT_SOURCE_DIR}/parser.y
+    OUTPUT ${INTER_FILES}
+    COMMAND flex -o ${PSD}/__lex.c ${PSD}/lex.l
+    COMMAND bison -dvt -o ${PSD}/__parser.c ${PSD}/parser.y
     DEPENDS lex.l parser.y
 )
 
-SET(srcs lex.c parser.c main.c)
+SET(srcs __lex.c __parser.c main.c)
 SET(exename parser)
 
 ADD_EXECUTABLE(${exename} ${srcs})
